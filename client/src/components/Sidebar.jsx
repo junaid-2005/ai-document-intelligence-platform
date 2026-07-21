@@ -8,7 +8,6 @@ import {
   History,
   Shield,
   Brain,
-  HardDrive,
   X,
 } from "lucide-react";
 
@@ -204,73 +203,6 @@ function Sidebar({ mobile = false, closeSidebar }) {
       </div>
 
       <div className="border-t border-slate-200 p-5">
-        <div
-          className="
-          rounded-3xl
-          border
-          border-slate-200
-          bg-slate-50
-          p-5
-          "
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-xl
-              bg-blue-100
-              "
-            >
-              <HardDrive size={18} className="text-blue-600" />
-            </div>
-
-            <div>
-              <p
-                className="
-                text-sm
-                font-semibold
-                text-slate-900
-                "
-              >
-                Storage
-              </p>
-
-              <p
-                className="
-                text-xs
-                text-slate-500
-                "
-              >
-                Loading...
-              </p>
-            </div>
-          </div>
-
-          <div
-            className="
-            mt-4
-            h-2
-            overflow-hidden
-            rounded-full
-            bg-slate-200
-            "
-          >
-            <div
-              className="
-              h-full
-              w-0
-              rounded-full
-              bg-linear-to-r
-              from-blue-600
-              to-indigo-600
-              "
-            />
-          </div>
-        </div>
         <div className="mt-6">
           <p
             className="
