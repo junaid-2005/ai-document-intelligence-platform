@@ -18,6 +18,7 @@ function Dashboard() {
     chats: 0,
     summaries: 0,
     storageBytes: 0,
+    storageMB: 0,
     uploadsThisWeek: 0,
     recentDocuments: [],
   });
@@ -38,7 +39,17 @@ function Dashboard() {
 
       setDocuments(docs || []);
 
-      setStats(dashboard);
+      if (dashboard.success) {
+        setStats({
+          documents: dashboard.documents || 0,
+          chats: dashboard.chats || 0,
+          summaries: dashboard.summaries || 0,
+          storageBytes: dashboard.storageBytes || 0,
+          storageMB: dashboard.storageMB || 0,
+          uploadsThisWeek: dashboard.uploadsThisWeek || 0,
+          recentDocuments: dashboard.recentDocuments || [],
+        });
+      }
     } catch (error) {
       console.error(error);
     } finally {

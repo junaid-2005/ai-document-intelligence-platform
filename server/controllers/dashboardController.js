@@ -20,24 +20,26 @@ const getDashboardStats = async (req, res) => {
       })
       .eq("user_id", userId);
 
-    const { count: summaries = 0 } = await supabase
+    const { data: summaryDocs = [], error: summaryError } = await supabase
       .from("documents")
-      .select("*", {
-        count: "exact",
-        head: true,
-      })
+      .select("summary")
       .eq("user_id", userId)
       .not("summary", "is", null);
 
-    const { data: files = [], error } = await supabase
+    if (summaryError) throw summaryError;
+
+    const summaries = summaryDocs.filter(
+      (doc) => doc.summary && doc.summary.trim() !== "",
+    ).length;
+
+    const { data: docs = [], error } = await supabase
       .from("documents")
       .select(
         `
         id,
         file_name,
         file_size,
-        created_at,
-        summary
+        created_at
       `,
       )
       .eq("user_id", userId)
@@ -47,8 +49,8 @@ const getDashboardStats = async (req, res) => {
 
     if (error) throw error;
 
-    const storageBytes = files.reduce(
-      (sum, file) => sum + (file.file_size || 0),
+    const storageBytes = docs.reduce(
+      (sum, doc) => sum + (doc.file_size || 0),
       0,
     );
 
@@ -57,25 +59,21 @@ const getDashboardStats = async (req, res) => {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    const uploadsThisWeek = files.filter(
-      (file) => new Date(file.created_at) >= weekAgo,
+    const uploadsThisWeek = docs.filter(
+      (doc) => new Date(doc.created_at) >= weekAgo,
     ).length;
 
-    const recentDocuments = files.slice(0, 5);
-
-    return res.json({
+    return res.status(200).json({
       success: true,
       documents,
       chats,
       summaries,
-      uploadsThisWeek,
       storageBytes,
       storageMB,
-      recentDocuments,
+      uploadsThisWeek,
+      recentDocuments: docs.slice(0, 5),
     });
   } catch (error) {
-    console.error(error);
-
     return res.status(500).json({
       success: false,
       message: error.message,

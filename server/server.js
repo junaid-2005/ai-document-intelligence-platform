@@ -8,6 +8,7 @@ const historyRoutes = require("./routes/historyRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const summaryRoutes = require("./routes/summaryRoutes");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/history", historyRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/summary", summaryRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

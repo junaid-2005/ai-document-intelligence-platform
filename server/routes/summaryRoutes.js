@@ -4,8 +4,8 @@ const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
 
-const { getDashboardStats } = require("../controllers/dashboardController");
+const { generateSummary } = require("../controllers/summaryController");
 
-router.get("/", authMiddleware, getDashboardStats);
+router.post("/:documentId", authMiddleware, generateSummary);
 
 module.exports = router;

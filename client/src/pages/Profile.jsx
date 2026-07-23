@@ -132,13 +132,11 @@ function Profile() {
             <div className="space-y-5">
               <div className="flex justify-between border-b pb-4">
                 <span className="text-slate-500">Email</span>
-
                 <span className="font-semibold">{user?.email}</span>
               </div>
 
               <div className="flex justify-between border-b pb-4">
                 <span className="text-slate-500">User ID</span>
-
                 <span className="max-w-xs truncate text-sm font-semibold">
                   {user?.id}
                 </span>
@@ -146,7 +144,6 @@ function Profile() {
 
               <div className="flex justify-between border-b pb-4">
                 <span className="text-slate-500">Email Verified</span>
-
                 <span className="font-semibold">
                   {user?.email_confirmed_at ? "Yes" : "No"}
                 </span>
@@ -154,7 +151,6 @@ function Profile() {
 
               <div className="flex justify-between">
                 <span className="text-slate-500">Account Status</span>
-
                 <span className="font-semibold text-green-600">Active</span>
               </div>
             </div>

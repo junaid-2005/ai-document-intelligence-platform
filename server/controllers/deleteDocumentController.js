@@ -1,26 +1,19 @@
-const deleteDocument =
-  require("../utils/deleteDocument");
+const deleteDocument = require("../utils/deleteDocument");
 
-const removeDocument = async (
-  req,
-  res
-) => {
+const removeDocument = async (req, res) => {
   try {
-    const { documentId } =
-      req.params;
+    const { documentId } = req.params;
 
-    await deleteDocument(
-      documentId,
-      req.user.id
-    );
+    await deleteDocument(documentId, req.user.id);
 
     return res.status(200).json({
       success: true,
-      message:
-        "Document deleted successfully",
+      message: "Document deleted successfully.",
     });
   } catch (error) {
-    return res.status(403).json({
+    console.error(error);
+
+    return res.status(500).json({
       success: false,
       message: error.message,
     });

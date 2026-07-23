@@ -6,7 +6,7 @@ const API = "http://localhost:5000/api/dashboard";
 export const getDashboardStats = async () => {
   const token = await getAccessToken();
 
-  const { data } = await axios.get(`${API}/stats`, {
+  const { data } = await axios.get(API, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

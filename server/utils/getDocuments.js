@@ -1,22 +1,29 @@
-const supabase =
-  require("../config/supabase");
+const supabase = require("../config/supabase");
 
-const getDocuments = async (
-  userId
-) => {
-  const { data, error } =
-    await supabase
-      .from("documents")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", {
-        ascending: false,
-      });
+const getDocuments = async (userId) => {
+  const { data, error } = await supabase
+    .from("documents")
+    .select(
+      `
+      id,
+      file_name,
+      file_url,
+      file_size,
+      summary,
+      created_at
+    `,
+    )
+    .eq("user_id", userId)
+    .order("created_at", {
+      ascending: false,
+    });
 
-  if (error) throw error;
+  if (error) {
+    console.error(error);
+    throw error;
+  }
 
-  return data;
+  return data || [];
 };
 
-module.exports =
-  getDocuments;
+module.exports = getDocuments;

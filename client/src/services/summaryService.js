@@ -1,17 +1,14 @@
 import axios from "axios";
 import { getAccessToken } from "./supabase";
 
-const API = "http://localhost:5000/api/chat";
+const API = "http://localhost:5000/api/summary";
 
-export const askDocument = async (documentId, question, replyTo = null) => {
+export const generateSummary = async (documentId) => {
   const token = await getAccessToken();
 
   const { data } = await axios.post(
     `${API}/${documentId}`,
-    {
-      question,
-      replyTo,
-    },
+    {},
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -19,8 +16,5 @@ export const askDocument = async (documentId, question, replyTo = null) => {
     },
   );
 
-  return {
-    answer: data.answer,
-    retrievedChunks: data.retrievedChunks,
-  };
+  return data;
 };

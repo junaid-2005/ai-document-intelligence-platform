@@ -1,12 +1,14 @@
 import { Bell, Search, UserCircle2, Menu } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 function Topbar({ onMenuClick }) {
   const { user } = useAuth();
 
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
 
   const navItems = [
     {
@@ -131,25 +133,29 @@ function Topbar({ onMenuClick }) {
             <input
               type="text"
               placeholder="Search documents..."
-              readOnly
-              onClick={() => navigate("/search")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && search.trim()) {
+                  navigate(`/search?q=${encodeURIComponent(search)}`);
+                }
+              }}
               className="
-    w-80
-    rounded-2xl
-    border
-    border-slate-200
-    bg-white
-    py-3
-    pl-11
-    pr-4
-    text-sm
-    outline-none
-    cursor-pointer
-    transition-all
-    hover:border-blue-500
-    focus:border-blue-500
-    focus:ring-2
-    focus:ring-blue-100
+              w-80
+              rounded-2xl
+              border
+             border-slate-200
+             bg-white
+             py-3
+             pl-11
+             pr-4
+            text-sm
+            outline-none
+            transition-all
+          hover:border-blue-500
+         focus:border-blue-500
+         focus:ring-2
+         focus:ring-blue-100
     "
             />
           </div>

@@ -1,5 +1,7 @@
+import { generateSummary } from "../services/summaryService";
 import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
+import { getDocuments } from "../services/documentService";
 import {
   Send,
   Bot,
@@ -23,6 +25,7 @@ function AIChat() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [summaryLoading, setSummaryLoading] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
   const [copiedIndex, setCopiedIndex] = useState(null);
 
@@ -55,30 +58,53 @@ function AIChat() {
         (item) => String(item.document_id) === String(documentId),
       );
 
-      if (documentHistory.length > 0) {
-        const formatted = [];
+      const docsResult = await getDocuments();
+      const docs = Array.isArray(docsResult)
+        ? docsResult
+        : docsResult.documents || [];
 
-        documentHistory.reverse().forEach((item) => {
-          formatted.push({
-            role: "user",
-            content: item.question,
-          });
+      const currentDocument = docs.find(
+        (doc) => String(doc.id) === String(documentId),
+      );
 
-          formatted.push({
-            role: "assistant",
-            content: item.answer,
-          });
+      const formatted = [];
+
+      if (currentDocument?.summary && currentDocument.summary.trim() !== "") {
+        formatted.push({
+          role: "assistant",
+          content: currentDocument.summary,
+          isSummary: true,
+        });
+      }
+
+      documentHistory.reverse().forEach((item) => {
+        formatted.push({
+          role: "user",
+          content: item.question,
+          replyTo: item.reply_to || null,
         });
 
-        setMessages(formatted);
+        formatted.push({
+          role: "assistant",
+          content: item.answer,
+        });
+      });
+
+      if (formatted.length === 0) {
+        formatted.push({
+          role: "assistant",
+          content:
+            "👋 Welcome to DocAI.\n\nI'm ready to answer questions about your uploaded document.",
+        });
       }
+
+      setMessages(formatted);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
-
   const copyMessage = async (text, index) => {
     await navigator.clipboard.writeText(text);
 
@@ -88,7 +114,35 @@ function AIChat() {
       setCopiedIndex(null);
     }, 1500);
   };
+  const handleGenerateSummary = async () => {
+    try {
+      setSummaryLoading(true);
 
+      const data = await generateSummary(documentId);
+      await loadHistory();
+
+      setMessages((prev) => {
+        const withoutOldSummary = prev.filter((m) => !m.isSummary);
+
+        return [
+          {
+            role: "assistant",
+            content: data.summary,
+            isSummary: true,
+          },
+          ...withoutOldSummary,
+        ];
+      });
+    } catch (err) {
+      alert(
+        err?.response?.data?.message ||
+          err.message ||
+          "Unable to generate summary.",
+      );
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
   const sendMessage = async () => {
     if (!message.trim() || sending) return;
 
@@ -99,6 +153,7 @@ function AIChat() {
       {
         role: "user",
         content: currentQuestion,
+        replyTo,
       },
     ]);
 
@@ -124,12 +179,15 @@ function AIChat() {
       ]);
 
       setReplyTo(null);
-    } catch {
+    } catch (err) {
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Something went wrong while contacting the AI.",
+          content:
+            err?.response?.data?.message ||
+            err.message ||
+            "Something went wrong while contacting the AI.",
         },
       ]);
     } finally {
@@ -157,15 +215,35 @@ function AIChat() {
               </div>
             </div>
 
-            <div className="hidden lg:flex items-center gap-3 rounded-2xl bg-white/10 px-5 py-3 backdrop-blur">
-              <FileText size={22} />
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleGenerateSummary}
+                disabled={summaryLoading}
+                className="
+    rounded-xl
+    bg-white/15
+    px-5
+    py-3
+    text-sm
+    font-semibold
+    backdrop-blur
+    hover:bg-white/20
+    disabled:opacity-50
+    "
+              >
+                {summaryLoading ? "Generating..." : "Generate Summary"}
+              </button>
 
-              <div>
-                <p className="text-xs uppercase tracking-widest text-blue-100">
-                  Active Document
-                </p>
+              <div className="hidden lg:flex items-center gap-3 rounded-2xl bg-white/10 px-5 py-3 backdrop-blur">
+                <FileText size={22} />
 
-                <p className="font-semibold">#{documentId}</p>
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-blue-100">
+                    Active Document
+                  </p>
+
+                  <p className="font-semibold">#{documentId}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -247,8 +325,19 @@ function AIChat() {
                         <Bot size={19} />
                       </div>
                     )}
-
                     <div className="max-w-[78%]">
+                      {msg.role === "user" && msg.replyTo && (
+                        <div className="mb-2 rounded-xl border-l-4 border-blue-500 bg-blue-50 px-4 py-2">
+                          <p className="text-xs font-semibold text-blue-700">
+                            Replying to
+                          </p>
+
+                          <p className="mt-1 line-clamp-2 text-sm text-slate-600">
+                            {msg.replyTo}
+                          </p>
+                        </div>
+                      )}
+
                       <div
                         className={`rounded-[26px] px-6 py-5 leading-8 transition-all duration-300 ${
                           msg.role === "assistant"
@@ -288,10 +377,10 @@ function AIChat() {
                         {msg.role === "assistant" && (
                           <button
                             onClick={() => setReplyTo(msg.content)}
-                            className="flex items-center gap-2 text-xs font-medium text-slate-500 transition hover:text-blue-600"
+                            className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
                           >
                             <Reply size={14} />
-                            Reply
+                            Reply to this answer
                           </button>
                         )}
                       </div>

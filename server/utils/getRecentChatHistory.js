@@ -3,9 +3,9 @@ const supabase = require("../config/supabase");
 const getRecentChatHistory = async (userId, documentId) => {
   const { data, error } = await supabase
     .from("chat_history")
-    .select("question, answer")
+    .select("question, answer, reply_to")
     .eq("user_id", userId)
-    .eq("document_id", documentId)
+    .eq("document_id", Number(documentId))
     .order("created_at", {
       ascending: false,
     })
@@ -16,7 +16,7 @@ const getRecentChatHistory = async (userId, documentId) => {
     return [];
   }
 
-  return data ?? [];
+  return data || [];
 };
 
 module.exports = getRecentChatHistory;

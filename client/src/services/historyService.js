@@ -1,24 +1,16 @@
 import axios from "axios";
+import { getAccessToken } from "./supabase";
 
-import {
-  getAccessToken,
-} from "./supabase";
+const API = "http://localhost:5000/api/history";
 
-export const getHistory =
-  async () => {
-    const token =
-      await getAccessToken();
+export const getHistory = async () => {
+  const token = await getAccessToken();
 
-    const response =
-      await axios.get(
-        "http://localhost:5000/api/history",
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`,
-          },
-        }
-      );
+  const { data } = await axios.get(API, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-    return response.data.history;
-  };
+  return data.history || [];
+};

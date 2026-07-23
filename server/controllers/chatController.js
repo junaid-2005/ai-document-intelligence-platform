@@ -1,25 +1,24 @@
 const supabase = require("../config/supabase");
 
 const searchRelevantChunks = require("../utils/searchRelevantChunks");
-
 const askGemini = require("../utils/askGemini");
-
 const saveChatHistory = require("../utils/saveChatHistory");
-
 const getRecentChatHistory = require("../utils/getRecentChatHistory");
+const checkChatLimit = require("../utils/checkChatLimit");
 
 const chatWithDocument = async (req, res) => {
   try {
     const { documentId } = req.params;
-
     const { question, replyTo } = req.body;
 
-    if (!question) {
+    if (!question || !question.trim()) {
       return res.status(400).json({
         success: false,
-        message: "Question is required",
+        message: "Question is required.",
       });
     }
+
+    const usage = await checkChatLimit(req.user.id);
 
     const { data: document, error: documentError } = await supabase
       .from("documents")
@@ -29,9 +28,9 @@ const chatWithDocument = async (req, res) => {
       .single();
 
     if (documentError || !document) {
-      return res.status(403).json({
+      return res.status(404).json({
         success: false,
-        message: "Document not found or access denied.",
+        message: "Document not found.",
       });
     }
 
@@ -40,7 +39,7 @@ const chatWithDocument = async (req, res) => {
     if (!chunks || chunks.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "No relevant information found in the document.",
+        message: "No relevant information found in the uploaded document.",
       });
     }
 
@@ -63,12 +62,30 @@ const chatWithDocument = async (req, res) => {
         ? geminiResponse
         : geminiResponse.answer;
 
-    await saveChatHistory(req.user.id, Number(documentId), question, answer);
+    await saveChatHistory(
+      req.user.id,
+      Number(documentId),
+      question,
+      answer,
+      replyTo,
+    );
+
+    const { error: updateError } = await supabase
+      .from("daily_usage")
+      .update({
+        chat_count: usage.chat_count + 1,
+      })
+      .eq("id", usage.id);
+
+    if (updateError) {
+      throw updateError;
+    }
 
     return res.status(200).json({
       success: true,
       answer,
       retrievedChunks: chunks.length,
+      remainingChats: 15 - (usage.chat_count + 1),
     });
   } catch (error) {
     console.error(error);

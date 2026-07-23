@@ -96,6 +96,10 @@ function UploadDocument() {
       setSuccess(true);
 
       setMessage(result.message || "Document uploaded successfully.");
+
+      setTimeout(() => {
+        navigate(`/chat/${result.documentId}`);
+      }, 1200);
     } catch (err) {
       console.error(err);
 
@@ -412,74 +416,69 @@ function UploadDocument() {
             <motion.div
               whileHover={{ y: -2 }}
               className="
-              rounded-3xl
-              border
-              border-slate-200
-              bg-white
-              p-6
-              shadow-sm
-              "
+  rounded-3xl
+  border
+  border-slate-200
+  bg-white
+  p-6
+  shadow-sm
+  "
             >
-              <h2 className="text-xl font-bold">Free Plan Limits</h2>
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-slate-900">
+                  Platform Capabilities
+                </h2>
 
-              <div className="mt-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span>Maximum File Size</span>
-                  <span className="font-bold">5 MB</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Maximum Pages</span>
-                  <span className="font-bold">30 Pages</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Supported Format</span>
-                  <span className="font-bold">PDF</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Active Document</span>
-                  <span className="font-bold">1 PDF</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Daily AI Chats</span>
-                  <span className="font-bold">15</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span>Daily Summaries</span>
-                  <span className="font-bold">5</span>
-                </div>
+                <p className="mt-2 text-sm text-slate-500">
+                  Current document processing configuration.
+                </p>
               </div>
-            </motion.div>
 
-            <motion.div
-              whileHover={{ y: -2 }}
-              className="
-              rounded-3xl
-              bg-linear-to-br
-              from-blue-700
-              via-indigo-700
-              to-purple-700
-              p-6
-              text-white
-              shadow-xl
-              "
-            >
-              <h2 className="text-xl font-bold">Upload Guidelines</h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">Supported Format</span>
+                  <span className="font-semibold text-slate-900">PDF</span>
+                </div>
 
-              <div className="mt-5 space-y-3 text-blue-100">
-                <p>• Upload only PDF documents.</p>
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">Maximum File Size</span>
+                  <span className="font-semibold text-slate-900">5 MB</span>
+                </div>
 
-                <p>• Maximum size: 5 MB.</p>
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">Recommended Pages</span>
+                  <span className="font-semibold text-slate-900">Up to 30</span>
+                </div>
 
-                <p>• Maximum pages: 30.</p>
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">Active Document</span>
+                  <span className="font-semibold text-slate-900">1</span>
+                </div>
 
-                <p>• Delete a PDF to free storage.</p>
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">Daily AI Conversations</span>
+                  <span className="font-semibold text-slate-900">15</span>
+                </div>
 
-                <p>• Chats & summaries are removed when the PDF is deleted.</p>
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">Daily AI Summaries</span>
+                  <span className="font-semibold text-slate-900">5</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">Semantic Search</span>
+                  <span className="font-semibold text-green-600">Enabled</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">Vector Embeddings</span>
+                  <span className="font-semibold text-green-600">Enabled</span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                  <span className="text-slate-600">AI Chat</span>
+                  <span className="font-semibold text-green-600">Enabled</span>
+                </div>
               </div>
             </motion.div>
           </div>
