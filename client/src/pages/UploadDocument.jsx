@@ -447,7 +447,7 @@ function UploadDocument() {
 
                 <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
                   <span className="text-slate-600">Recommended Pages</span>
-                  <span className="font-semibold text-slate-900">Up to 30</span>
+                  <span className="font-semibold text-slate-900">Up to 50</span>
                 </div>
 
                 <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">

@@ -9,22 +9,22 @@ const validatePdf = async (file) => {
     throw new Error("Only PDF files are allowed.");
   }
 
-  const maxSize = 20 * 1024 * 1024;
+  const maxSize = 5 * 1024 * 1024;
 
   if (file.size > maxSize) {
-    throw new Error("Maximum PDF size is 20 MB.");
+    throw new Error("Maximum PDF size is 5 MB.");
   }
 
   try {
     const pdf = await pdfParse(file.buffer);
 
-    if (pdf.numpages > 100) {
-      throw new Error("Maximum 100 pages are allowed.");
+    if (pdf.numpages > 50) {
+      throw new Error("Maximum 50 pages are allowed.");
     }
 
     if (!pdf.text || pdf.text.trim().length === 0) {
       throw new Error(
-        "This PDF appears to be scanned. OCR support is not available yet.",
+        "This PDF contains no selectable text. Please upload a text-based PDF.",
       );
     }
 
@@ -32,7 +32,10 @@ const validatePdf = async (file) => {
       pages: pdf.numpages,
     };
   } catch (error) {
-    if (error.message.startsWith("Maximum")) {
+    if (
+      error.message.startsWith("Maximum") ||
+      error.message.includes("no selectable text")
+    ) {
       throw error;
     }
 

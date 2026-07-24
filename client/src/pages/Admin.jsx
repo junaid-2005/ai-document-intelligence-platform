@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -19,6 +20,7 @@ import {
 import { getAdminDashboard } from "../services/adminService";
 
 function Admin() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
@@ -47,6 +49,10 @@ function Admin() {
 
       setUsers(data.users);
     } catch (error) {
+      if (error.response?.status === 403) {
+        return;
+      }
+
       console.error(error);
     } finally {
       setLoading(false);
@@ -237,7 +243,6 @@ function Admin() {
               </thead>
 
               <tbody>
-                {" "}
                 {filteredUsers.map((user) => (
                   <tr
                     key={user.id}

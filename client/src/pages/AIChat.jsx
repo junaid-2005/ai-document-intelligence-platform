@@ -2,6 +2,7 @@ import { generateSummary } from "../services/summaryService";
 import { useState, useEffect, useRef } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { getDocuments } from "../services/documentService";
+import { useNavigate } from "react-router-dom";
 import {
   Send,
   Bot,
@@ -21,6 +22,7 @@ import { getHistory } from "../services/historyService";
 
 function AIChat() {
   const { documentId } = useParams();
+  const navigate = useNavigate();
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -66,6 +68,19 @@ function AIChat() {
       const currentDocument = docs.find(
         (doc) => String(doc.id) === String(documentId),
       );
+      if (!currentDocument) {
+        setMessages([
+          {
+            role: "assistant",
+            isError: true,
+            content:
+              "Document Not Found\n\nThis document either doesn't exist or you don't have permission to access it.",
+          },
+        ]);
+
+        setLoading(false);
+        return;
+      }
 
       const formatted = [];
 
@@ -338,24 +353,93 @@ function AIChat() {
                         </div>
                       )}
 
-                      <div
-                        className={`rounded-[26px] px-6 py-5 leading-8 transition-all duration-300 ${
-                          msg.role === "assistant"
-                            ? "border border-slate-200 bg-white text-slate-700 shadow-lg"
-                            : "bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-xl"
-                        }`}
-                      >
-                        <p className="whitespace-pre-wrap wrap-break-word">
-                          {msg.content}
-                        </p>
+                      {msg.isError ? (
+                        <div
+                          className="
+      rounded-[28px]
+      border
+      border-red-200
+      bg-red-50
+      p-7
+      shadow-lg
+    "
+                        >
+                          <h2 className="text-2xl font-bold text-red-700">
+                            Document Not Found
+                          </h2>
 
-                        {msg.chunks && (
-                          <div className="mt-5 inline-flex rounded-full bg-blue-100 px-4 py-1 text-xs font-semibold text-blue-700">
-                            {msg.chunks} Relevant Chunks
+                          <p className="mt-4 leading-8 text-slate-700">
+                            This document either doesn't exist or you don't have
+                            permission to access it.
+                          </p>
+
+                          <button
+                            onClick={() => navigate("/documents")}
+                            className="
+        mt-6
+        rounded-xl
+        bg-red-600
+        px-5
+        py-3
+        font-semibold
+        text-white
+        transition
+        hover:bg-red-700
+      "
+                          >
+                            Back to Documents
+                          </button>
+                        </div>
+                      ) : msg.isSummary ? (
+                        <div
+                          className="
+      rounded-[28px]
+      border
+      border-slate-800
+      bg-slate-950
+      p-7
+      text-white
+      shadow-2xl
+    "
+                        >
+                          <div className="mb-5 flex items-center gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600">
+                              <Sparkles size={22} />
+                            </div>
+
+                            <div>
+                              <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
+                                AI GENERATED
+                              </p>
+
+                              <h3 className="text-xl font-bold">
+                                Document Summary
+                              </h3>
+                            </div>
                           </div>
-                        )}
-                      </div>
+                          <p className="whitespace-pre-wrap leading-8 text-slate-200">
+                            {msg.content}
+                          </p>
+                        </div>
+                      ) : (
+                        <div
+                          className={`rounded-[26px] px-6 py-5 leading-8 transition-all duration-300 ${
+                            msg.role === "assistant"
+                              ? "border border-slate-200 bg-white text-slate-700 shadow-lg"
+                              : "bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-xl"
+                          }`}
+                        >
+                          <p className="whitespace-pre-wrap wrap-break-word">
+                            {msg.content}
+                          </p>
 
+                          {msg.chunks && (
+                            <div className="mt-5 inline-flex rounded-full bg-blue-100 px-4 py-1 text-xs font-semibold text-blue-700">
+                              {msg.chunks} Relevant Chunks
+                            </div>
+                          )}
+                        </div>
+                      )}
                       <div className="mt-3 flex items-center gap-5 px-3">
                         <button
                           onClick={() => copyMessage(msg.content, index)}
@@ -417,43 +501,44 @@ function AIChat() {
               </>
             )}
           </div>{" "}
-          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 p-6 backdrop-blur-xl">
-            {replyTo && (
-              <div className="mb-5 rounded-2xl border border-blue-200 bg-blue-50 p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-blue-700">
-                      Replying to AI Response
-                    </p>
+          {!messages[0]?.isError && (
+            <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 p-6 backdrop-blur-xl">
+              {replyTo && (
+                <div className="mb-5 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-blue-700">
+                        Replying to AI Response
+                      </p>
 
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
-                      {replyTo}
-                    </p>
+                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
+                        {replyTo}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => setReplyTo(null)}
+                      className="rounded-xl p-2 transition hover:bg-blue-100"
+                    >
+                      <X size={18} />
+                    </button>
                   </div>
-
-                  <button
-                    onClick={() => setReplyTo(null)}
-                    className="rounded-xl p-2 transition hover:bg-blue-100"
-                  >
-                    <X size={18} />
-                  </button>
                 </div>
-              </div>
-            )}
+              )}
 
-            <div className="flex items-end gap-4">
-              <textarea
-                rows={1}
-                value={message}
-                placeholder="Ask anything about your document..."
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
-                className="
+              <div className="flex items-end gap-4">
+                <textarea
+                  rows={1}
+                  value={message}
+                  placeholder="Ask anything about your document..."
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                  className="
                 min-h-15
                 max-h-44
                 flex-1
@@ -474,12 +559,12 @@ function AIChat() {
                 focus:ring-4
                 focus:ring-blue-100
                 "
-              />
+                />
 
-              <button
-                disabled={!message.trim() || sending}
-                onClick={sendMessage}
-                className="
+                <button
+                  disabled={!message.trim() || sending}
+                  onClick={sendMessage}
+                  className="
                 flex
                 h-15
                 w-15
@@ -498,15 +583,16 @@ function AIChat() {
                 disabled:cursor-not-allowed
                 disabled:opacity-50
                 "
-              >
-                {sending ? (
-                  <Loader2 size={21} className="animate-spin" />
-                ) : (
-                  <Send size={22} />
-                )}
-              </button>
+                >
+                  {sending ? (
+                    <Loader2 size={21} className="animate-spin" />
+                  ) : (
+                    <Send size={22} />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
