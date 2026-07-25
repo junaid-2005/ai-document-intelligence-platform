@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken } from "./supabase";
 
-const API = "http://localhost:5000/api/admin";
+const API = `${import.meta.env.VITE_API_URL}/admin`;
 
 export const getAdminDashboard = async () => {
   const token = await getAccessToken();

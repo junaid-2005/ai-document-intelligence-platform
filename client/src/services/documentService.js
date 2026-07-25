@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken } from "./supabase";
 
-const API = "http://localhost:5000/api/documents";
+const API = `${import.meta.env.VITE_API_URL}/documents`;
 
 export const uploadPdfToBackend = async (file) => {
   const token = await getAccessToken();

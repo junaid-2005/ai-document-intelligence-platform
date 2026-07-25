@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken } from "./supabase";
 
-const API = "http://localhost:5000/api/chat";
+const API = `${import.meta.env.VITE_API_URL}/chat`;
 
 export const askDocument = async (documentId, question, replyTo = null) => {
   const token = await getAccessToken();
