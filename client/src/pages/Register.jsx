@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  useNavigate,
-  Link,
-} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 import { signUp } from "../services/authService";
 
@@ -18,49 +15,32 @@ import {
 function Register() {
   const navigate = useNavigate();
 
-  const [email, setEmail] =
-    useState("");
+  const [email, setEmail] = useState("");
 
-  const [password, setPassword] =
-    useState("");
+  const [password, setPassword] = useState("");
 
-  const [
-    confirmPassword,
-    setConfirmPassword,
-  ] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = async (
-    e
-  ) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (
-      password !==
-      confirmPassword
-    ) {
-      alert(
-        "Passwords do not match"
-      );
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
       return;
     }
 
-    const { error } =
-      await signUp(
-        email,
-        password
-      );
+    const { error } = await signUp(email, password);
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    navigate("/verify-email");
+    navigate("/login");
   };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-
       {/* LEFT */}
 
       <div
@@ -96,47 +76,26 @@ function Register() {
         </h1>
 
         <p className="mt-6 text-slate-400 text-lg max-w-lg">
-          Create an account and start
-          uploading documents,
-          generating AI summaries,
-          semantic search and
-          intelligent document chat.
+          Create an account and start uploading documents, generating AI
+          summaries, semantic search and intelligent document chat.
         </p>
 
         <div className="mt-12 space-y-5">
-
           <div className="flex items-center gap-3">
-            <ShieldCheck
-              size={18}
-              className="text-blue-500"
-            />
-            <span>
-              Secure Cloud Storage
-            </span>
+            <ShieldCheck size={18} className="text-blue-500" />
+            <span>Secure Cloud Storage</span>
           </div>
 
           <div className="flex items-center gap-3">
-            <ShieldCheck
-              size={18}
-              className="text-blue-500"
-            />
-            <span>
-              AI Document Analysis
-            </span>
+            <ShieldCheck size={18} className="text-blue-500" />
+            <span>AI Document Analysis</span>
           </div>
 
           <div className="flex items-center gap-3">
-            <ShieldCheck
-              size={18}
-              className="text-blue-500"
-            />
-            <span>
-              Semantic Search
-            </span>
+            <ShieldCheck size={18} className="text-blue-500" />
+            <span>Semantic Search</span>
           </div>
-
         </div>
-
       </div>
 
       {/* RIGHT */}
@@ -164,7 +123,6 @@ function Register() {
           "
         >
           <div className="flex items-center gap-4">
-
             <div
               className="
               h-14
@@ -176,28 +134,18 @@ function Register() {
               justify-center
               "
             >
-              <UserPlus
-                size={24}
-                className="text-blue-600"
-              />
+              <UserPlus size={24} className="text-blue-600" />
             </div>
 
             <div>
-              <h2 className="text-3xl font-bold">
-                Create Account
-              </h2>
+              <h2 className="text-3xl font-bold">Create Account</h2>
 
-              <p className="text-slate-500">
-                Start your AI journey
-              </p>
+              <p className="text-slate-500">Start your AI journey</p>
             </div>
-
           </div>
 
           <div className="mt-8 space-y-5">
-
             <div className="relative">
-
               <Mail
                 size={18}
                 className="
@@ -212,11 +160,7 @@ function Register() {
                 type="email"
                 placeholder="Email Address"
                 value={email}
-                onChange={(e) =>
-                  setEmail(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 className="
                 w-full
                 pl-12
@@ -231,11 +175,9 @@ function Register() {
                 "
                 required
               />
-
             </div>
 
             <div className="relative">
-
               <Lock
                 size={18}
                 className="
@@ -250,11 +192,7 @@ function Register() {
                 type="password"
                 placeholder="Password"
                 value={password}
-                onChange={(e) =>
-                  setPassword(
-                    e.target.value
-                  )
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 className="
                 w-full
                 pl-12
@@ -269,11 +207,9 @@ function Register() {
                 "
                 required
               />
-
             </div>
 
             <div className="relative">
-
               <Lock
                 size={18}
                 className="
@@ -287,14 +223,8 @@ function Register() {
               <input
                 type="password"
                 placeholder="Confirm Password"
-                value={
-                  confirmPassword
-                }
-                onChange={(e) =>
-                  setConfirmPassword(
-                    e.target.value
-                  )
-                }
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="
                 w-full
                 pl-12
@@ -309,7 +239,6 @@ function Register() {
                 "
                 required
               />
-
             </div>
 
             <button
@@ -330,18 +259,12 @@ function Register() {
               "
             >
               Create Account
-
-              <ArrowRight
-                size={18}
-              />
+              <ArrowRight size={18} />
             </button>
-
           </div>
 
           <p className="text-center mt-6 text-slate-500">
-
             Already have an account?{" "}
-
             <Link
               to="/login"
               className="
@@ -351,12 +274,9 @@ function Register() {
             >
               Sign In
             </Link>
-
           </p>
-
         </form>
       </div>
-
     </div>
   );
 }
