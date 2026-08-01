@@ -11,13 +11,10 @@ const uploadPdfToStorage = async (file) => {
     });
 
   if (error) {
-    console.error(error);
     throw error;
   }
 
-  const { data } = supabase.storage.from("documents").getPublicUrl(fileName);
-
-  return data.publicUrl;
+  return fileName;
 };
 
 module.exports = uploadPdfToStorage;

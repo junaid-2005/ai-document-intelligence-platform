@@ -95,7 +95,7 @@ const uploadDocument = async (req, res) => {
 
 const getDocuments = async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data: documents, error } = await supabase
       .from("documents")
       .select(
         `
@@ -116,9 +116,28 @@ const getDocuments = async (req, res) => {
       throw error;
     }
 
+    const documentsWithUrls = await Promise.all(
+      (documents || []).map(async (document) => {
+        let signedUrl = null;
+
+        if (document.file_url) {
+          const { data } = await supabase.storage
+            .from("documents")
+            .createSignedUrl(document.file_url, 60 * 60);
+
+          signedUrl = data?.signedUrl || null;
+        }
+
+        return {
+          ...document,
+          file_url: signedUrl,
+        };
+      }),
+    );
+
     return res.json({
       success: true,
-      documents: data || [],
+      documents: documentsWithUrls,
     });
   } catch (error) {
     console.error(error);
@@ -163,11 +182,7 @@ const deleteDocument = async (req, res) => {
 
     if (document.file_url) {
       try {
-        const path = decodeURIComponent(
-          document.file_url.split("/documents/")[1],
-        );
-
-        await supabase.storage.from("documents").remove([path]);
+        await supabase.storage.from("documents").remove([document.file_url]);
       } catch (storageError) {
         console.error("Storage delete failed:", storageError.message);
       }
