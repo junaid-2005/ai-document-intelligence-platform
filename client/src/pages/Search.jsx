@@ -25,9 +25,9 @@ function Search() {
     try {
       setLoading(true);
 
-      const data = await searchDocuments(searchQuery);
+      const results = await searchDocuments(searchQuery);
 
-      setResults(data.results || []);
+      setResults(results || []);
     } catch (error) {
       console.error(error);
 
