@@ -1,25 +1,19 @@
 import axios from "axios";
+import { getAccessToken } from "./supabase";
 
-import {
-  getAccessToken,
-} from "./supabase";
+const API = `${import.meta.env.VITE_API_URL}/search`;
 
-export const searchDocuments =
-  async (query) => {
+export const searchDocuments = async (query) => {
+  const token = await getAccessToken();
 
-    const token =
-      await getAccessToken();
+  const { data } = await axios.get(
+    `${API}?query=${encodeURIComponent(query)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 
-    const response =
-      await axios.get(
-        `http://localhost:5000/api/search?query=${encodeURIComponent(query)}`,
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`,
-          },
-        }
-      );
-
-    return response.data.results;
-  };
+  return data.results;
+};
